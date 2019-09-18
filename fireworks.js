@@ -4,40 +4,43 @@ let explosion = [];
 class Firework {
     constructor() {
         this.Init()
-        gravity = createVector(0, 1);
+        gravity = createVector(0, .25);
     }
     Init() {
         this.fuse = randomRange(0, 100);
         this.size = randomRange(5, 10);
-        this.position = createVector(randomRange(0, width), height + 10);
-        this.velocity = createVector(randomRange(-3, 3), randomRange(-40, -30));
+        this.position = createVector(randomRange(0, width), height + this.size);
+        this.velocity = createVector(randomRange(-4, 4), randomRange(-20, -13));
+        this.initialVelocity = this.velocity.y;
         this.pastPosition = this.position;
         this.colorWheelAngle = randomRange(0, TWO_PI);
     }
     Update() {
-        if (this.fuse > 0) {
-            this.fuse--;
-        }
-        else {
+        this.fuse--;
+        if (this.fuse < 0) {
             this.pastPosition = this.position.copy();
             this.velocity.add(gravity);
-            if (this.velocity.y > 0) {
-                push()
-                fill(this.GetColor(255, 255));
-                noStroke();
-                ellipse(this.position.x, this.position.y, this.size * 10, this.size * 10)
-                pop()
-                this.Init()
+            if (this.fuse < -60) {
+                this.Explode()
+                this.Init();
                 return true;
             }
-            // else
-            // if (this.position.y > height+this.size) {
-            //     this.Init()
-            // }
-            else {
-                this.position.add(this.velocity);
-            }
+            else
+                if (this.position.y > height + this.size) {
+                    console.log("dud", this.fuse, this.position, this.initialVelocity);
+                    this.Init();
+                }
+                else {
+                    this.position.add(this.velocity);
+                }
         }
+    }
+    Explode() {
+        push()
+        fill(this.GetColor(255, 255));
+        noStroke();
+        ellipse(this.position.x, this.position.y, this.size * 10, this.size * 10)
+        pop();
     }
     Draw() {
         push();

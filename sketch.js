@@ -1,4 +1,4 @@
-const fwCount = 30;
+const fwCount = 10;
 const fireWorks = [];
 
 function randomRange(min,max) {
