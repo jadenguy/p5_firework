@@ -1,3 +1,4 @@
+const fwCount = 30;
 const fireWorks = [];
 
 function randomRange(min,max) {
@@ -9,7 +10,7 @@ function setup() {
 
   fill(0);
   stroke(0);
-  for (let index = 0; index < 10; index++) {
+  for (let index = 0; index < fwCount; index++) {
     fireWorks.push(new Firework())
   }
 }
