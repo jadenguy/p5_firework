@@ -1,17 +1,18 @@
-let g;
-class Firework {
-    constructor(x, y, color, size = Math.random() * 5) {
-        this.Init(x, y, color, size)
-        g = createVector(0,.5);
-    }
-    Init(x, y, color, size) {
-        this.position = createVector(x, y);
-        this.velocity = createVector(0, -10 + -10 * Math.random());
-        this.pastPosition = this.position;
-        this.fuse = Math.random() * 100;
-        this.size = size;
-        this.color = color;
+let gravity;
+let explosion = [];
 
+class Firework {
+    constructor() {
+        this.Init()
+        gravity = createVector(0, 1);
+    }
+    Init() {
+        this.fuse = Math.random() * 100;
+        this.size = Math.random() * 10;
+        this.position = createVector(randomRange(0, width), height + 10);
+        this.velocity = createVector(randomRange(-3, 3), randomRange(-40, -30));
+        this.pastPosition = this.position;
+        this.fireColor = color(Math.random() * 100 + 100, Math.random() * 100 + 155, Math.random() * 100 + 100);
     }
     Update() {
         if (this.fuse > 0) {
@@ -19,10 +20,20 @@ class Firework {
         }
         else {
             this.pastPosition = this.position.copy();
-            this.velocity.add(g);
+            this.velocity.add(gravity);
             if (this.velocity.y > 0) {
-                // this.Init(Math.random() * width, height, color(0))
+                push()
+                fill(255);
+                noStroke();
+                ellipse(this.position.x, this.position.y, this.size*10, this.size*10)
+                pop()
+                this.Init()
+                return true;
             }
+            // else
+            // if (this.position.y > height+this.size) {
+            //     this.Init()
+            // }
             else {
                 this.position.add(this.velocity);
             }
@@ -30,9 +41,11 @@ class Firework {
     }
     Draw() {
         push();
-        noStroke();
-        ellipse(this.position.x, this.position.y, this.size);
+        stroke(this.fireColor);
+        strokeWeight(1);
+        fill(255);
         line(this.pastPosition.x, this.pastPosition.y, this.position.x, this.position.y);
+        ellipse(this.position.x, this.position.y, this.size);
         pop();
     }
 }

@@ -1,11 +1,16 @@
-let fireWorks = [];
+const fireWorks = [];
+
+function randomRange(min,max) {
+  return map(Math.random(), 0, 1, min, max) 
+}
 
 function setup() {
-  createCanvas(500, 500);
+  createCanvas(800, 800);
+
   fill(0);
   stroke(0);
-  for (let index = 0; index < 100; index++) {
-    fireWorks.push(new Firework(Math.random() * width, height, color(0)))
+  for (let index = 0; index < 10; index++) {
+    fireWorks.push(new Firework())
   }
 }
 
@@ -14,9 +19,9 @@ function clamp(num, min, max) {
 }
 
 function draw() {
-  background(240);
+  background(50);
   fireWorks.forEach(fw => {
     fw.Update();
-    fw.Draw();    
+    fw.Draw();
   });
 }
