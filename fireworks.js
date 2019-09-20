@@ -1,6 +1,8 @@
 let gravity;
-const splinters = 3;
+const splinters = 2;
 const g = .002;
+const trail = 10;
+const maxInit = 1.75;
 
 
 class FireWorks {
@@ -34,21 +36,21 @@ class Firework {
     constructor(fuse = random(0, 1000)
         , size = random(5, 10)
         , position = createVector(random(0, width), height + size)
-        , velocity = createVector(random(-.25, .25), random(-1.75, -1.35))
+        , velocity = createVector(random(-.25, .25), -random(.75 * maxInit, maxInit))
         , colorWheelAngle = random(0, TWO_PI)
         , explosive = true
         , explosionTime = -1000
-        , trailSize = 5) {
-        this.Init(fuse, size, position, velocity, colorWheelAngle, explosive, explosionTime, trailSize)
+        , trailSize = trail) {
+        this.Init(fuse, size, position, velocity, colorWheelAngle, explosive, explosionTime, trailSize);
     }
     Init(fuse = random(0, 1000)
         , size = random(5, 10)
         , position = createVector(random(0, width), height + size)
-        , velocity = createVector(random(-.25, .25), random(-1.75, -1.35))
+        , velocity = createVector(random(-.25, .25), -random(.75 * maxInit, maxInit))
         , colorWheelAngle = random(0, TWO_PI)
         , explosive = true
         , explosionTime = -1000
-        , trailSize = 3) {
+        , trailSize = trail) {
         this.fuse = fuse;
         this.size = size;
         this.position = position;
@@ -60,7 +62,6 @@ class Firework {
         this.pastPositions = [];
         for (let index = 0; index < trailSize; index++) {
             this.pastPositions.push(position.copy());
-            
         }
     }
     Update() {
@@ -73,8 +74,8 @@ class Firework {
                 return ret;
             }
             else
-                if (this.position.y > height + this.size) {
-                    console.log("dud", this.fuse, this.position, this.initialVelocity);
+                if (this.position.y > height + this.size && this.velocity.y > 0) {
+                    console.log("dud", this.fuse, this.position.y, this.velocity.y, this.size, this.initialVelocity);
                     this.Init();
                     return true;
                 }
@@ -103,15 +104,16 @@ class Firework {
             push();
             stroke(this.GetColor(200, 100));
             strokeWeight(1);
-            fill(this.GetColor(50, 100));
+            fill(color(0,0,0,0));
+            this.pastPositions.push(this.position.copy());
             beginShape();
             this.pastPositions.forEach(p => {
                 vertex(p.x, p.y)
             });
             endShape();
+            fill(this.GetColor(50, 100));
             ellipse(this.position.x, this.position.y, this.size);
             this.pastPositions.shift();
-            this.pastPositions.push(this.position.copy());
             pop();
         }
     }

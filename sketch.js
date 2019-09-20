@@ -1,5 +1,7 @@
 const fwCount = 15;
 const speed = 10;
+const frameSkip = 1;
+let i = 0;
 let fireworks;
 
 function setup() {
@@ -14,10 +16,13 @@ function clamp(num, min, max) {
 }
 
 function draw() {
-  background(50);
+  i++;
   for (let index = 0; index < speed; index++) {
     fireworks.Update();
   }
-  fireworks.Draw();
-
+  if (frameSkip == i) {
+    background(50);
+    fireworks.Draw();
+    i = 0;
+  }
 }
