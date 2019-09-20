@@ -1,4 +1,4 @@
-const fwCount = 20;
+const fwCount = 15;
 const speed = 10;
 let fireworks;
 
@@ -17,7 +17,6 @@ function draw() {
   background(50);
   for (let index = 0; index < speed; index++) {
     fireworks.Update();
-    
   }
   fireworks.Draw();
 

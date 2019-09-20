@@ -1,5 +1,6 @@
 let gravity;
-let explosion = [];
+const splinters = 3;
+const g = .002;
 
 
 class FireWorks {
@@ -8,13 +9,20 @@ class FireWorks {
         this.fireworks = [];
         for (let index = 0; index < count; index++) {
             this.fireworks.push(new Firework())
+            gravity = createVector(0, g);
         }
     }
     Update() {
-        this.fireworks.forEach(fw => {
+        for (let index = 0; index < this.fireworks.length; index++) {
+            const fw = this.fireworks[index];
             const explosions = fw.Update();
-            if (explosions) { this.fireworks.Push(explosions); }
-        });
+            if ((typeof explosions) == 'object') {
+                explosions.forEach(x => { this.fireworks.push(x) });
+            }
+            if (explosions == false) {
+                this.fireworks.splice(index, 1);
+            }
+        }
     }
     Draw() {
         this.fireworks.forEach(fw => {
@@ -22,7 +30,6 @@ class FireWorks {
         });
     }
 }
-
 class Firework {
     constructor(fuse = random(0, 1000)
         , size = random(5, 10)
@@ -30,9 +37,9 @@ class Firework {
         , velocity = createVector(random(-.25, .25), random(-1.75, -1.35))
         , colorWheelAngle = random(0, TWO_PI)
         , explosive = true
-        , explosionTime = -1000) {
-        this.Init(fuse, size, position, velocity, colorWheelAngle, explosive, explosionTime)
-        gravity = createVector(0, .002);
+        , explosionTime = -1000
+        , trailSize = 5) {
+        this.Init(fuse, size, position, velocity, colorWheelAngle, explosive, explosionTime, trailSize)
     }
     Init(fuse = random(0, 1000)
         , size = random(5, 10)
@@ -40,7 +47,8 @@ class Firework {
         , velocity = createVector(random(-.25, .25), random(-1.75, -1.35))
         , colorWheelAngle = random(0, TWO_PI)
         , explosive = true
-        , explosionTime = -1000) {
+        , explosionTime = -1000
+        , trailSize = 3) {
         this.fuse = fuse;
         this.size = size;
         this.position = position;
@@ -49,12 +57,15 @@ class Firework {
         this.explosive = explosive;
         this.explosionTime = explosionTime;
         this.initialVelocity = this.velocity.y;
-        this.pastPosition = this.position;
+        this.pastPositions = [];
+        for (let index = 0; index < trailSize; index++) {
+            this.pastPositions.push(position.copy());
+            
+        }
     }
     Update() {
         this.fuse--;
         if (this.fuse < 0) {
-
             this.velocity.add(gravity);
             if (this.fuse < this.explosionTime) {
                 const ret = this.Explode();
@@ -65,30 +76,42 @@ class Firework {
                 if (this.position.y > height + this.size) {
                     console.log("dud", this.fuse, this.position, this.initialVelocity);
                     this.Init();
+                    return true;
                 }
                 else {
                     this.position.add(this.velocity);
+                    return true;
                 }
         }
+        return true;
     }
     Explode() {
         if (this.explosive) {
-            push()
-            fill(this.GetColor(255, 255, 255));
-            noStroke();
-            ellipse(this.position.x, this.position.y, this.size * 10, this.size * 10)
-            pop();
+            const ret = [];
+            for (let i = 0; i < this.size * splinters; i++) {
+                const angle = i * (TWO_PI / (this.size * splinters));
+                const direction = createVector(0, this.size * .05);
+                direction.rotate(angle);
+                ret.push(new Firework(0, 1, this.position.copy(), direction, this.colorWheelAngle, false, this.explosionTime / 3))
+            }
+            return ret;
         }
+        return false;
     }
     Draw() {
-        if (this.fuse < 0) {
+        if (this.fuse <= 0) {
             push();
             stroke(this.GetColor(200, 100));
             strokeWeight(1);
             fill(this.GetColor(50, 100));
-            line(this.pastPosition.x, this.pastPosition.y, this.position.x, this.position.y);
+            beginShape();
+            this.pastPositions.forEach(p => {
+                vertex(p.x, p.y)
+            });
+            endShape();
             ellipse(this.position.x, this.position.y, this.size);
-            this.pastPosition = this.position.copy();
+            this.pastPositions.shift();
+            this.pastPositions.push(this.position.copy());
             pop();
         }
     }
