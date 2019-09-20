@@ -37,7 +37,7 @@ class Firework {
         , size = random(5, 10)
         , position = createVector(random(0, width), height + size)
         , velocity = createVector(random(-.25, .25), -random(.75 * maxInit, maxInit))
-        , colorWheelAngle = random(0, TWO_PI)
+        , colorWheelAngle = random()
         , explosive = true
         , explosionTime = -1000
         , trailSize = trail) {
@@ -47,7 +47,7 @@ class Firework {
         , size = random(5, 10)
         , position = createVector(random(0, width), height + size)
         , velocity = createVector(random(-.25, .25), -random(.75 * maxInit, maxInit))
-        , colorWheelAngle = random(0, TWO_PI)
+        , hue = random()
         , explosive = true
         , explosionTime = -1000
         , trailSize = trail) {
@@ -55,9 +55,9 @@ class Firework {
         this.size = size;
         this.position = position;
         this.velocity = velocity;
-        this.colorWheelAngle = colorWheelAngle;
+        this.hue = hue;
         this.explosive = explosive;
-        this.explosionTime = explosionTime;
+        this.fuseEndTime = explosionTime;
         this.initialVelocity = this.velocity.y;
         this.pastPositions = [];
         for (let index = 0; index < trailSize; index++) {
@@ -68,7 +68,7 @@ class Firework {
         this.fuse--;
         if (this.fuse < 0) {
             this.velocity.add(gravity);
-            if (this.fuse < this.explosionTime) {
+            if (this.fuse < this.fuseEndTime) {
                 const ret = this.Explode();
                 this.Init();
                 return ret;
@@ -93,7 +93,7 @@ class Firework {
                 const angle = i * (TWO_PI / (this.size * splinters));
                 const direction = createVector(0, this.size * .05);
                 direction.rotate(angle);
-                ret.push(new Firework(0, 1, this.position.copy(), direction, this.colorWheelAngle, false, this.explosionTime / 3))
+                ret.push(new Firework(0, 1, this.position.copy(), direction, this.hue, false, this.fuseEndTime / 3))
             }
             return ret;
         }
@@ -104,7 +104,7 @@ class Firework {
             push();
             stroke(this.GetColor(200, 100));
             strokeWeight(1);
-            fill(color(0,0,0,0));
+            fill(color(0, 0, 0, 0));
             this.pastPositions.push(this.position.copy());
             beginShape();
             this.pastPositions.forEach(p => {
@@ -118,12 +118,16 @@ class Firework {
         }
     }
     GetColor(brightness, saturation, alphaMin = 0, alphaMax = 255) {
-        const r = brightness - map(Math.sin(this.colorWheelAngle + 1 / 3 * TWO_PI), -1, 1, 0, 1) * saturation;
-        const g = brightness - map(Math.sin(this.colorWheelAngle + 2 / 3 * TWO_PI), -1, 1, 0, 1) * saturation;
-        const b = brightness - map(Math.sin(this.colorWheelAngle + 3 / 3 * TWO_PI), -1, 1, 0, 1) * saturation; //this is cheeky
-        const c = color(r, g, b);
-        const a = map(this.fuse - this.explosionTime, 0, -this.explosionTime, alphaMin, alphaMax);
-        c.setAlpha(a);
+        colorMode(HSB, 1, 255, 255, 255);
+        const c = color(this.hue
+            , saturation
+            , brightness
+            , map(this.fuse - this.fuseEndTime
+                , 0
+                , -this.fuseEndTime
+                , alphaMin
+                , alphaMax)
+        );
         return c;
     }
 }

@@ -9,6 +9,7 @@ function setup() {
   fill(0);
   stroke(0);
   fireworks = (new FireWorks(fwCount));
+  $fwCount = 0;
 }
 
 function clamp(num, min, max) {
@@ -24,5 +25,10 @@ function draw() {
     background(50);
     fireworks.Draw();
     i = 0;
+
+    if (fireworks.fireworks.length != $fwCount) {
+      $fwCount = fireworks.fireworks.length;
+      console.log($fwCount, frameRate());
+    }
   }
 }
