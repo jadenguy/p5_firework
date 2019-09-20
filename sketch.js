@@ -1,18 +1,12 @@
-const fwCount = 10;
-const fireWorks = [];
-
-function randomRange(min,max) {
-  return map(Math.random(), 0, 1, min, max) 
-}
+const fwCount = 20;
+const speed = 10;
+let fireworks;
 
 function setup() {
   createCanvas(800, 800);
-
   fill(0);
   stroke(0);
-  for (let index = 0; index < fwCount; index++) {
-    fireWorks.push(new Firework())
-  }
+  fireworks = (new FireWorks(fwCount));
 }
 
 function clamp(num, min, max) {
@@ -21,8 +15,10 @@ function clamp(num, min, max) {
 
 function draw() {
   background(50);
-  fireWorks.forEach(fw => {
-    fw.Update();
-    fw.Draw();
-  });
+  for (let index = 0; index < speed; index++) {
+    fireworks.Update();
+    
+  }
+  fireworks.Draw();
+
 }
