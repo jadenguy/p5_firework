@@ -1,5 +1,5 @@
 let gravity;
-const splinters = 2;
+let splinters = 2;
 const g = .002;
 const trail = 10;
 const maxInit = 1.75;
@@ -7,7 +7,6 @@ const maxInit = 1.75;
 
 class FireWorks {
     constructor(count) {
-        this.count = count;
         this.fireworks = [];
         for (let index = 0; index < count; index++) {
             this.fireworks.push(new Firework())
@@ -15,15 +14,19 @@ class FireWorks {
         }
     }
     Update() {
-        for (let index = 0; index < this.fireworks.length; index++) {
+        for (let index = this.fireworks.length - 1; index >= 0; index--) {
             const fw = this.fireworks[index];
             const explosions = fw.Update();
             if ((typeof explosions) == 'object') {
                 explosions.forEach(x => { this.fireworks.push(x) });
             }
-            if (explosions == false) {
+            else if (explosions === false) {
                 this.fireworks.splice(index, 1);
             }
+            // else {
+            // console.log("something");
+
+            // }
         }
     }
     Draw() {
@@ -69,15 +72,16 @@ class Firework {
         if (this.fuse < 0) {
             this.velocity.add(gravity);
             if (this.fuse < this.fuseEndTime) {
-                const ret = this.Explode();
+                const ret = this.BurnOut();
                 this.Init();
                 return ret;
             }
             else
                 if (this.position.y > height + this.size && this.velocity.y > 0) {
                     console.log("dud", this.fuse, this.position.y, this.velocity.y, this.size, this.initialVelocity);
+                    const ret = this.explosive;
                     this.Init();
-                    return true;
+                    return ret;
                 }
                 else {
                     this.position.add(this.velocity);
@@ -86,13 +90,15 @@ class Firework {
         }
         return true;
     }
-    Explode() {
+    BurnOut() {
         if (this.explosive) {
             const ret = [];
-            for (let i = 0; i < this.size * splinters; i++) {
-                const angle = i * (TWO_PI / (this.size * splinters));
-                const direction = createVector(0, this.size * .05);
-                direction.rotate(angle);
+            const randRotateOffset = random(TWO_PI);
+            const splinterCount = 1 + floor(this.size * splinters);
+            for (let i = 0; i <= splinterCount; i++) {
+                const angle = i * ((TWO_PI) / splinterCount);
+                const direction = createVector(this.size * .05, 0);
+                direction.rotate(angle + randRotateOffset);
                 ret.push(new Firework(0, 1, this.position.copy(), direction, this.hue, false, this.fuseEndTime / 3))
             }
             return ret;
@@ -103,7 +109,7 @@ class Firework {
         if (this.fuse <= 0) {
             push();
             stroke(this.GetColor(200, 100));
-            strokeWeight(1);
+            strokeWeight(3);
             fill(color(0, 0, 0, 0));
             this.pastPositions.push(this.position.copy());
             beginShape();

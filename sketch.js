@@ -2,13 +2,13 @@ const fwCount = 15;
 const speed = 10;
 const frameSkip = 1;
 let i = 0;
-let fireworks;
+let f;
 
 function setup() {
-  createCanvas(800, 800);
+  createCanvas(window.innerWidth, window.innerHeight);
   fill(0);
   stroke(0);
-  fireworks = (new FireWorks(fwCount));
+  f = (new FireWorks(fwCount));
   $fwCount = 0;
 }
 
@@ -19,16 +19,15 @@ function clamp(num, min, max) {
 function draw() {
   i++;
   for (let index = 0; index < speed; index++) {
-    fireworks.Update();
+    f.Update();
   }
   if (frameSkip == i) {
     background(50);
-    fireworks.Draw();
+    f.Draw();
     i = 0;
-
-    if (fireworks.fireworks.length != $fwCount) {
-      $fwCount = fireworks.fireworks.length;
-      console.log($fwCount, frameRate());
-    }
+    //   if (f.fireworks.length != $fwCount) {
+    //     $fwCount = f.fireworks.length;
+    //     console.log($fwCount, frameRate());
+    //   }
   }
 }
